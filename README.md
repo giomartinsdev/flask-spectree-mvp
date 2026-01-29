@@ -1,77 +1,55 @@
-# API Flask com DDD e Spectree
+# Flask Spectree MVP
 
-API simples implementada com Flask, Domain-Driven Design (DDD) e Spectree para geração automática de documentação Swagger.
+Minimal Flask application demonstrating Spectree for automatic OpenAPI documentation.
 
-## Estrutura do Projeto
+## Overview
 
-```
-src/
-├── domain/
-│   ├── entities/          # Entidades de domínio
-│   ├── repositories/      # Interfaces de repositórios
-│   └── services/          # Serviços de domínio
-├── infrastructure/
-│   └── database/          # Implementação de repositórios (Mock)
-└── presentation/
-    ├── controllers/       # Controllers/Endpoints
-    └── dtos/             # Data Transfer Objects
-```
+This MVP shows Spectree integration with:
+- **Spectree** for automatic OpenAPI 3.0 documentation
+- **Pydantic** for request/response validation
+- **Flask** web framework
 
-## Instalação
+## Quick Start
+
+### Installation
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-## Execução
-
-```bash
 python app.py
 ```
 
-A API estará disponível em `http://localhost:5000`
+Visit `http://localhost:5001/doc/swagger` for interactive documentation in swagger and `http://localhost:5001/doc/openapi.json` for the OpenAPI specification.
 
-## Endpoints
+## Spectree Configuration
 
-### Usuários
+```python
+from spectree import SpecTree
 
-- `GET /api/users` - Listar todos os usuários
-- `GET /api/users/{id}` - Buscar usuário por ID
-- `POST /api/users` - Criar novo usuário
-- `PUT /api/users/{id}` - Atualizar usuário
-- `DELETE /api/users/{id}` - Deletar usuário
-
-## Documentação Swagger
-
-Acesse `http://localhost:5000/doc` para ver a documentação interativa gerada pelo Spectree.
-
-## Exemplos de Uso
-
-### Criar Usuário
-```bash
-curl -X POST http://localhost:5000/api/users \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Novo Usuário", "email": "novo@example.com"}'
+api = SpecTree(
+    'flask',
+    path='doc',        # Documentation endpoint
+    mode='strict'      # Strict validation mode
+)
 ```
 
-### Listar Usuários
-```bash
-curl http://localhost:5000/api/users
+## Usage Example
+
+```python
+@user_bp.route('', methods=['POST'])
+@api.validate(
+    json=UserCreateRequest,
+    resp=Response(HTTP_201=UserResponse, HTTP_400=ErrorResponse),
+    tags=['Users']
+)
+def create_user(json: UserCreateRequest):
+    # Handler logic
+    pass
 ```
 
-### Buscar Usuário
-```bash
-curl http://localhost:5000/api/users/1
-```
+## Dependencies
 
-### Atualizar Usuário
-```bash
-curl -X PUT http://localhost:5000/api/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Nome Atualizado"}'
-```
-
-### Deletar Usuário
-```bash
-curl -X DELETE http://localhost:5000/api/users/1
-```
+- **Flask 3.0.0**
+- **Spectree 2.0.1**
+- **Pydantic 2.11**

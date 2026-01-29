@@ -1,3 +1,7 @@
 from spectree import SpecTree
 
-api = SpecTree('flask')
+api = SpecTree(
+    'flask',
+    path='doc',
+    mode='strict'
+)
